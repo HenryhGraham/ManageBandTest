@@ -1,0 +1,49 @@
+﻿@using ManageBandApp.ViewModels
+@model RemindersReportViewModel
+
+<h2>Остатки по складу</h2>
+
+<form enctype="multipart/form-data" asp-controller="Reminders" asp-action="Index" method="post">
+
+    <div>
+        <h4>Склад:</h4>
+        <select asp-for="StockId" name="StockId">
+            @foreach (var item in Model.Stocks)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+        <h4>Дата:</h4>
+        @Html.EditorFor(model => model.RemidersDate, new { htmlAttributes = new { type = "date" } })
+    </div>
+    <div style="margin-top: 2rem;">
+        <input type="submit" value="Показать остатки" class="btn btn-primary" />
+        <a asp-controller="Goods" asp-action="GoodsMovings" class="btn btn-primary">Уйти</a>
+    </div>
+
+    @if (Model.NomenclatureReminders.Count > 0)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Номенклатура</th>
+                    <th>Остаток</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reminder in Model.NomenclatureReminders)
+                {
+                    <tr>
+                        <td>
+                            @reminder.NomenclatureName
+                        </td>
+                        <td>
+                            @reminder.Reminder
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    }
+</form>

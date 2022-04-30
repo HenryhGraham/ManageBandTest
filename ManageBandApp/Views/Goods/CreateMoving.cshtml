@@ -1,0 +1,130 @@
+﻿@using ManageBandApp.ViewModels
+@model CreateMovingViewModel
+
+<h2>Создание перемещения номенклатуры</h2>
+
+<form enctype="multipart/form-data" asp-controller="Goods" asp-action="CreateMoving" method="post">
+
+    <div>
+        <h3>Откуда идет перемещение:</h3>
+        <select asp-for="StockOutId" name="StockOutId">
+            <option value="0">Извне</option>
+            @foreach (var item in Model.Stocks)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+    </div>
+    <div>
+        <h3>Куда идет перемещение:</h3>
+        <select name="stockInId" asp-for="StockInId">
+            <option value="0">Вовне</option>
+            @foreach (var item in Model.Stocks)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+    </div>
+    <div>
+        <h4>Дата:</h4>
+        @Html.EditorFor(model => model.MovingDate, new { htmlAttributes = new { type = "date" } })
+    </div>
+
+    <div id="NomenContainer">
+        <h3>Номенклатуры</h3>
+        <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th>Номенклатура</th>
+                    <th>Количество</th>
+                    <td class="text-center">
+                        <a id="addRow" class="btn btn-warning" onclick="AddNomenclature()">
+                            Добавить
+                        </a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.NomenclaturesToCreate.Count; i++)
+                {
+                    @if (Model.NomenclaturesToCreate[i].Deleted == "false")
+                    {
+                        <tr class="customRow" id="NomenclatureRow_@i">
+                            <td>
+                                <select asp-for="@Model.NomenclaturesToCreate[i].NomenclatureId">
+                                    <option value="0">Выберите</option>
+                                    @foreach (var nomen in Model.Nomenclatures)
+                                    {
+                                        <option value="@nomen.Id">@nomen.Name</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" min="0" asp-for="@Model.NomenclaturesToCreate[i].Count">
+                            </td>
+                            <td>
+                                <input style="display:none;" type="text" asp-for="@Model.NomenclaturesToCreate[i].Deleted" value="false" checked="@Model.NomenclaturesToCreate[i].Deleted" />
+                                <a class="btn btn-danger" onclick="DeleteNomenclature(@i)">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div style="margin-top: 5rem;">
+        <input type="submit" value="Создать" class="btn btn-primary" />
+        <a asp-controller="Goods" asp-action="GoodsMovings" class="btn btn-primary">Отмена</a>
+    </div>
+
+</form>
+
+@if (Model.Errors.Count > 0)
+{
+    <div class="alert alert-danger">
+        @foreach (string error in Model.Errors)
+        {
+            <div class="alert text-danger">@error</div>
+        }
+    </div>
+}
+else if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success text-success">
+        @ViewBag.SuccessMessage
+    </div>
+}
+<script>
+
+    function AddNomenclature() {
+        var nextId = $(".customRow").length;
+
+        var rowHtml = '<tr class="customRow" id="NomenclatureRow_' + nextId + '">' +
+            '<td>' +
+            '<select id="NomenclaturesToCreate_' + nextId + '__NomenclatureId" name="NomenclaturesToCreate[' + nextId + '].NomenclatureId" value="">' +
+            '<option value="0">Выберите</option>' +
+
+            "@Html.Raw(string.Join("", Model.Nomenclatures.Select(n => $"<option value='{n.Id}'>{n.Name}</option>")))" +
+            '</select>' +
+
+            '</td>' +
+
+            '<td>' +
+            '<input  type="number" min="0" id="NomenclaturesToCreate_' + nextId + '__Count" name="NomenclaturesToCreate[' + nextId + '].Count" value=""/>' +
+
+
+            '</td>' +
+
+            '<td>' +
+            '<input style="display:none;"  type="text" id="NomenclaturesToCreate_' + nextId + '__Deleted" name="NomenclaturesToCreate[' + nextId + '].Deleted" value="false"/>' +
+            '<a class="btn btn-danger" onclick="DeleteNomenclature(' + nextId+ ')">Удалить</a>'+
+            '</td>' +
+
+            '</tr>';
+        console.log(rowHtml);
+
+        $("#myTable").append(rowHtml);
+    }
+
+
+</script>

@@ -1,0 +1,61 @@
+﻿@using ManageBandApp.ViewModels
+
+@model GoodsMovingViewModel
+
+<h2>Перемещения номенклатуры</h2>
+<table border="1" class="table">
+    <thead>
+        <tr>
+            <th>Идентификатор перемещения</th>
+            <th>Дата перемещения</th>
+            <th>Откуда</th>
+            <th>Куда</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var item in Model.Movings)
+            {
+                <tr>
+                    <td class="text-center">
+                        @item.MovingId
+                    </td>
+                    <td class="text-center">
+                        @item.MovingTime.ToLongDateString()
+                    </td>
+                    <td class="text-center">
+                        @(item.StockOut == null ? "Извне" : item.StockOut.Name)
+                    </td>
+                    <td class="text-center">
+                        @(item.StockIn == null ? "Вовне" : item.StockIn.Name)
+                    </td>
+                    <td class="text-center">
+                        <a class="nav-link" asp-controller="Goods"
+                           asp-action="Remove"
+                           asp-route-id="@item.MovingId"
+                           asp-route-pageNum="@Model.CurrentPage">Удалить</a>
+                    </td>
+                </tr>
+            }
+
+
+        }
+    </tbody>
+</table>
+<div class="row">
+    @if (Model.HavePreviousPage)
+    {
+        <a asp-controller="Goods"
+           asp-action="GoodsMovings"
+           asp-route-pageNum="@(Model.CurrentPage - 1)"
+           class="nav-link">Назад</a>
+    }
+    @if (Model.HaveNextPage)
+    {
+        <a asp-controller="Goods"
+           asp-action="GoodsMovings"
+           asp-route-pageNum="@(Model.CurrentPage + 1)"
+           class="nav-link">Вперед</a>
+    }
+</div>
